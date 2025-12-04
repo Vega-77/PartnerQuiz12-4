@@ -1,30 +1,34 @@
 //Alexander Vega & Jacob Grim 12/4/2025
 import java.io.*;
 import java.util.ArrayList;
+import java.util.concurrent.*;
 public class PartnerGitQuiz{
-    // Hardcode your file paths here:
-    private static final String FILE1 = "C:\\Users\\10020137\\Desktop\\GitUnit\\Grimms_Fairy_Tales.txt";
-    private static final String FILE2 = "C:\\Users\\10020137\\Desktop\\GitUnit\\War_and_Peace.txt";
-    static ArrayList<Character> chars = new ArrayList<>();
+    private static final String FILE1 = "C:\\Users\\10020268\\Documents\\GitHubThings\\GitKraken\\PartnerQuiz12-4\\Grimms_Fairy_Tales.txt";
+    private static final String FILE2 = "C:\\Users\\10020268\\Documents\\GitHubThings\\GitKraken\\PartnerQuiz12-4\\War_and_Peace.txt";
 	public static void main(String[]args){
-        long startTime = System.nanoTime();
+		long startTime = System.nanoTime();
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        // Prepare tasks
+        Callable<ArrayList<Character>> task1 = () -> processFile(FILE1);
+        Callable<ArrayList<Character>> task2 = () -> processFile(FILE1);
 
         try {
-            processFile(FILE1);
-            processFile(FILE2);
-        } catch (IOException e) {
-            System.out.println("Error reading files: " + e.getMessage());
-            return;
+            Future<ArrayList<Character>> result1 = executor.submit(task1);
+            Future<ArrayList<Character>> result2 = executor.submit(task2);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            executor.shutdown();
         }
+        System.out.println("Time taken: "+(System.nanoTime()-startTime)/1_000_000+" ms");
+	}
 
-        long endTime = System.nanoTime();
-        long elapsedMs = (endTime - startTime) / 1_000_000;
-
-        System.out.println("\nTotal time: " + elapsedMs + " ms");
-    }
-
-    private static void processFile(String filePath) throws IOException {
+    private static ArrayList<Character> processFile(String filePath) throws IOException {
         System.out.println("Processing file: " + filePath);
+    	ArrayList<Character> chars = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             int c;
@@ -33,5 +37,6 @@ public class PartnerGitQuiz{
                 chars.add(upper);
             }
         }
+        return chars;
     }
 }
